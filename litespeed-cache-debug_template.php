@@ -71,7 +71,7 @@ if( lsc_debug_show_admin_content() ){
                 </li>
                 <li>You can change parameter for another blog:<br>
                     <code id="lsc_debug_code_blog" style="display: block; padding: 10px; background: #f0f0f0; margin: 10px 0; font-family: monospace; cursor: pointer;" onClick="litespeed_copy_to_clipboard('lsc_debug_code_blog')">
-                        <?php echo get_site_url(); ?>/?<?php echo LSCWP_DEBUG_PARAM_USER; ?>=<?php echo !empty($username) ? esc_html($username) : 'YOUR_USERNAME'; ?>&<?php echo LSCWP_DEBUG_PARAM_PASS; ?>=<?php echo !empty($password) ? esc_html($password) : 'YOUR_PASSWORD'; ?>&<?php echo LSCWP_DEBUG_PARAM_ACTION; ?>=set_options&<?php echo LSCWP_DEBUG_PARAM_PASS; ?>=<?php echo !empty($password) ? esc_html($password) : 'YOUR_PASSWORD'; ?>&<?php echo LSCWP_DEBUG_PARAM_BLOG; ?>=1&optm-css_min=0&optm-js_defer=2
+                        <?php echo get_site_url(); ?>/?<?php echo LSCWP_DEBUG_PARAM_USER; ?>=<?php echo !empty($username) ? esc_html($username) : 'YOUR_USERNAME'; ?>&<?php echo LSCWP_DEBUG_PARAM_PASS; ?>=<?php echo !empty($password) ? esc_html($password) : 'YOUR_PASSWORD'; ?>&<?php echo LSCWP_DEBUG_PARAM_ACTION; ?>=set_options&<?php echo LSCWP_DEBUG_PARAM_BLOG; ?>=1&optm-css_min=0&optm-js_defer=2
                     </code>
                 </li>
                 <li>You can run actions:<br>
@@ -94,5 +94,6 @@ if( lsc_debug_show_admin_content() ){
     <ul>
         <li><a href="<?php echo lsc_debug_admin_create_link('clear_err_domains'); ?>">Cloud Error Domains</a></li>
         <li><a href="<?php echo lsc_debug_admin_create_link('clear_disabled_nodes'); ?>">Cloud Disabled Nodes</a></li>
+        <li><a href="<?php echo lsc_debug_admin_create_link('clear_settings'); ?>">All settings !!!Make a backup!!!</a></li>
     </ul>
 <?php } ?>

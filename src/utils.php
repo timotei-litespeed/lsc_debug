@@ -105,7 +105,8 @@ function lsc_debug_link_parse(){
                         switch_to_blog($blog);
                     }
                     foreach($options as $option => $value){
-                        update_option('litespeed.conf.'.$option, $value);
+                        \LiteSpeed\Config::update_option($option, $value);
+                        //update_option('litespeed.conf.'.$option, $value);
                     }
                     if($blog){
                         restore_current_blog();

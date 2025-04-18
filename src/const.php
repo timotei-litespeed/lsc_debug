@@ -22,4 +22,5 @@
     'clear_err_domains' => [ 'function' => 'clear_err_domains', 'message_ok' => 'Error Domains cleared', 'message_error' => 'Error Domains NOT cleared' ],
     'clear_disabled_nodes' => [ 'function' => 'clear_disabled_nodes', 'message_ok' => 'Disabled nodes cleared', 'message_error' => 'Disabled nodes NOT cleared' ],
     'set_options' => [ 'function' => 'set_options' ],
+    'clear_settings' => [ 'function' => 'clear_settings' ],
 ]);

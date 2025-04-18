@@ -119,3 +119,15 @@ function lsc_debug_clear_err_domains(){
 function lsc_debug_clear_disabled_nodes(){
     \LiteSpeed\Cloud::save_summary(['disabled_node' => []]);
 }
+
+function lsc_debug_clear_settings(){
+    global $wpdb;
+    $table_name = $wpdb->prefix . 'options';
+    $table_name = "{$wpdb->prefix}options";
+    $wpdb->query( $wpdb->prepare( "DELETE FROM `$table_name` WHERE `option_name` like '%litespeed.%' " ) );
+
+
+    if ( defined( 'LSCWP_V' ) ) {
+        do_action( 'litespeed_purge_all' );
+    }
+}
