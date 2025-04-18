@@ -30,8 +30,6 @@
  */
 defined('WPINC') || exit();
 
-if ( !defined( 'LSCWP_V' ) )  return;
-
 !defined('LSCWP_DEBUG_DIR') && define('LSCWP_DEBUG_DIR', __DIR__ . '/');
 
 require_once LSCWP_DEBUG_DIR.'src/const.php';
