@@ -1,0 +1,10 @@
+{
+    "name": "lsc debug",
+    "version": "1.0.0",
+    "scripts": {
+        "pack": "node pack.js"
+    },
+    "dependencies": {
+        "archiver": "^7.0.1"
+    }
+}

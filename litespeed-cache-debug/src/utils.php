@@ -137,3 +137,20 @@ function lsc_debug_link_parse(){
         }
     }
 }
+
+// Admin menu
+function lsc_debug_admin_menu(){
+	add_submenu_page(
+		'litespeed',
+		'Debug Helper',
+		'Debug Helper',
+		'manage_options',
+		'litespeed-debug',
+		'lsc_debug_admin_menu_page'
+	);
+}
+
+function lsc_debug_admin_menu_page()
+{
+	require_once LSCWP_DEBUG_DIR.'litespeed-cache-debug_template.php';
+}

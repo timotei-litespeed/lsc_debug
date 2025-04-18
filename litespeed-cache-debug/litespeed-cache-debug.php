@@ -30,33 +30,21 @@
  */
 defined('WPINC') || exit();
 
-!defined('LSCWP_DEBUG_DIR') && define('LSCWP_DEBUG_DIR', __DIR__ . '/');
+add_action('init', 'lsc_debug_start', 99);
 
-require_once LSCWP_DEBUG_DIR.'src/const.php';
-require_once LSCWP_DEBUG_DIR.'src/utils.php';
-require_once LSCWP_DEBUG_DIR.'src/actions.php';
+function lsc_debug_start(){
+	!defined('LSCWP_DEBUG_DIR') && define('LSCWP_DEBUG_DIR', __DIR__ . '/');
 
-// Add admin menu and show content
-add_action('admin_menu', 'lsc_debug_inject_menu', 9999);
-
-function lsc_debug_inject_menu(){
-	add_submenu_page(
-		'litespeed',
-		'Debug Helper',
-		'Debug Helper',
-		'manage_options',
-		'litespeed-debug',
-		'lsc_debug_display_page'
-	);
-}
-
-function lsc_debug_display_page()
-{
-	require_once LSCWP_DEBUG_DIR.'litespeed-cache-debug_template.php';
+	require_once LSCWP_DEBUG_DIR.'src/const.php';
+	require_once LSCWP_DEBUG_DIR.'src/utils.php';
+	require_once LSCWP_DEBUG_DIR.'src/actions.php';
+	
+	// Add admin menu and show content
+	add_action('admin_menu', 'lsc_debug_admin_menu', 9999);
 }
 
 // Link logic
-add_action('init', 'lsc_debug_link_parse');
+add_action('init', 'lsc_debug_link_parse', 100);
 
 // Deactivation procedure
 register_deactivation_hook(__FILE__, function() {
