@@ -7,7 +7,7 @@ function zipDirectory(sourceDir, outPath) {
 
   return new Promise((resolve, reject) => {
     archive
-      .directory(sourceDir, false)
+      .directory('./' + sourceDir + '/', sourceDir)
       .on('error', err => reject(err))
       .pipe(stream)
     ;
@@ -16,6 +16,9 @@ function zipDirectory(sourceDir, outPath) {
     archive.finalize();
   });
 }
-const archiveName = './litespeed-cache-debug.zip'
+
+
+const pluginDir = 'litespeed-cache-debug';
+const archiveName = './' + pluginDir + '.zip';
 if( fs.existsSync(archiveName) ) fs.rmSync(archiveName);
-zipDirectory('./litespeed-cache-debug/', archiveName)
+zipDirectory(pluginDir, archiveName)
