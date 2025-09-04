@@ -23,4 +23,7 @@
     'clear_disabled_nodes' => [ 'function' => 'clear_disabled_nodes', 'message_ok' => 'Disabled nodes cleared', 'message_error' => 'Disabled nodes NOT cleared' ],
     'set_options' => [ 'function' => 'set_options' ],
     'clear_settings' => [ 'function' => 'clear_settings', 'message_ok' => 'All settings cleared', 'message_error' => 'Settings NOT cleared' ],
+    'redetect_image_node' => [ 'function' => 'redetect_image_node', 'message_ok' => 'Image optimization node updated', 'message_error' => 'Failed to update image optimization node' ],
+    'redetect_page_node' => [ 'function' => 'redetect_page_node', 'message_ok' => 'Page optimization node updated', 'message_error' => 'Failed to update page optimization node' ],
+    'reset_ttl' => [ 'function' => 'reset_ttl', 'message_ok' => 'Page optimization services TTL reset', 'message_error' => 'Failed to reset TTL' ],                                             
 ]);
