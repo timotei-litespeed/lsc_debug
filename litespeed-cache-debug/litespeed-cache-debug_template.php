@@ -98,9 +98,8 @@ if( lsc_debug_show_admin_content() ){
     </ul>
 <?php } ?>
 
+<br />
 <h2>Redetect Nodes</h2>
-<hr>
-
 <div style="display: flex; gap: 20px; flex-wrap: wrap;">
     <!-- Image Optimization Box -->
     <div style="flex: 1; min-width: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
