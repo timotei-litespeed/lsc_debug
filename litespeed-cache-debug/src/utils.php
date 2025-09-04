@@ -8,11 +8,11 @@ function lsc_debug_show_admin_content(){
 }
 
 function lsc_debug_test_if_debug_action(){
-    return isset($_GET[LSCWP_DEBUG_PARAM_ACTION]);
+	return isset($_REQUEST[LSCWP_DEBUG_PARAM_ACTION]);
 }
 
 function lsc_debug_get_action(){
-    return isset($_GET[LSCWP_DEBUG_PARAM_ACTION]) ? $_GET[LSCWP_DEBUG_PARAM_ACTION] : false;
+    return isset($_REQUEST[LSCWP_DEBUG_PARAM_ACTION]) ? sanitize_key($_REQUEST[LSCWP_DEBUG_PARAM_ACTION]) : false;
 }
 
 // Test user and password
