@@ -26,4 +26,5 @@
     'redetect_image_node' => [ 'function' => 'redetect_image_node', 'message_ok' => 'Image optimization node updated', 'message_error' => 'Failed to update image optimization node' ],
     'redetect_page_node' => [ 'function' => 'redetect_page_node', 'message_ok' => 'Page optimization node updated', 'message_error' => 'Failed to update page optimization node' ],
     'reset_ttl' => [ 'function' => 'reset_ttl', 'message_ok' => 'Page optimization services TTL reset', 'message_error' => 'Failed to reset TTL' ],                                             
+    'import_report' => [ 'function' => 'import_report', 'message_ok' => 'Settings imported', 'message_error' => 'Failed to import settings' ],                                             
 ]);

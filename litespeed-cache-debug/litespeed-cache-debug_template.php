@@ -227,10 +227,8 @@ if( lsc_debug_show_admin_content() ){
     updateNodeOptions();
 </script>
 
-
+<br />
 <h2>Reset Page Optimization Services TTL</h2>
-<hr>
-
 <div style="margin-top: 30px; flex: 1; min-width: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 30%;">
     <h3 style="margin-top: 0;">Reset TTL</h3>
 
@@ -254,5 +252,17 @@ if( lsc_debug_show_admin_content() ){
         <?php wp_nonce_field('litespeed_debug_reset_ttl', 'litespeed_debug_nonce'); ?>
         <input type="hidden" name="<?php echo esc_attr(LSCWP_DEBUG_PARAM_ACTION); ?>" value="reset_ttl">
         <button type="submit" class="button button-primary" style="width: 100%;">Reset TTL</button>
+    </form>
+</div>
+
+<br />
+<h2>Import report settings</h2>
+<div style="margin-top: 30px; flex: 1; min-width: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 30%;">
+    <form method="post" action="<?php echo lsc_debug_admin_create_link('import_report'); ?>">
+        <p>Paste the settings from report:</p>
+        <?php wp_nonce_field('litespeed_debug_import_settings', 'litespeed_debug_nonce'); ?>
+        <textarea name="report_settings" rows="5" style="width: 100%;"></textarea>
+        <input type="hidden" name="action" value="import_report">
+        <button type="submit" class="button button-primary">Import</button>
     </form>
 </div>

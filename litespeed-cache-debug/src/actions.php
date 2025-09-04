@@ -190,7 +190,7 @@ function lsc_debug_redetect_page_node($service = null, $node = null){
         if (
             empty($_POST['litespeed_debug_nonce']) ||
             ! wp_verify_nonce($_POST['litespeed_debug_nonce'], 'litespeed_debug_redetect_page')
-        ) {
+        ) { 
             return;
         }
         $service = isset($_POST['service']) ? sanitize_text_field($_POST['service']) : '';
@@ -218,4 +218,35 @@ function lsc_debug_redetect_page_node($service = null, $node = null){
     \LiteSpeed\Cloud::save_summary([
         $map[$service] => 'https://' . $node . '.quic.cloud',
     ]);
+}
+
+// ---------- Import Report settings ----------
+function lsc_debug_import_report() {
+    if ( ! is_admin() || ! current_user_can('manage_options') ) {
+        return;
+    }
+    if (
+        empty($_POST['litespeed_debug_nonce']) ||
+        ! wp_verify_nonce($_POST['litespeed_debug_nonce'], 'litespeed_debug_import_settings')
+    ) {
+        return;
+    }
+    if ( ! class_exists('\LiteSpeed\Conf') ) {
+        throw new Exception('LSC not active');
+        return;
+    }
+    
+    if( isset($_POST['report_settings']) && !empty( $_POST['report_settings'] ) ){
+        $settings = lsc_debug_parse_settings($_POST['report_settings']);
+        if( isset( $settings['_version'] ) ) unset($settings['_version']);
+        if( isset( $settings['hash'] ) ) unset($settings['hash']);
+        if( isset( $settings['api_key'] ) ) unset($settings['api_key']);
+        if( isset( $settings['news'] ) ) unset($settings['api_key']);
+        if( isset( $settings['server_ip'] ) ) unset($settings['server_ip']);
+
+        lsc_debug_save_settings($settings);
+    }
+    else{
+        throw new Exception('Error');
+    }
 }

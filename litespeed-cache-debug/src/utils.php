@@ -105,7 +105,7 @@ function lsc_debug_link_parse(){
                         switch_to_blog($blog);
                     }
                     foreach($options as $option => $value){
-                        \LiteSpeed\Config::update_option($option, $value);
+                        \LiteSpeed\Conf::update_option($option, $value);
                         //update_option('litespeed.conf.'.$option, $value);
                     }
                     if($blog){
@@ -153,4 +153,115 @@ function lsc_debug_admin_menu(){
 function lsc_debug_admin_menu_page()
 {
 	require_once LSCWP_DEBUG_DIR.'litespeed-cache-debug_template.php';
+}
+
+// Parse settings from report
+function lsc_debug_save_settings($settings){
+    foreach($settings as $option => $value){
+        \LiteSpeed\Conf::update_option($option, $value);
+    }
+}
+
+function lsc_debug_parse_settings($text){
+    $lines = explode("\n", $text);
+    $config = [];
+    $i = 0;
+
+    while ($i < count($lines)) {
+        $line = trim($lines[$i]);
+
+        // Skip empty lines or lines with only spaces
+        if (empty($line)) {
+            $i++;
+            continue;
+        }
+
+        if (preg_match('/^([\w-]+)\s*=\s*(.*)$/', $line, $matches)) {
+            $key = $matches[1];
+            $valuePart = trim($matches[2]);
+
+            // need html decode?
+            $do_html_decode = false;
+            $html_decode    = [ 'media-placeholder_resp_svg' ];
+            if( array_search( $key, $html_decode ) !== false ){
+                 $do_html_decode = true;
+            }
+            
+            if ($valuePart === 'array (') {
+                $do_to_array = false;
+                $to_array    = [ 'cdn-mapping' ];
+                if( array_search( $key, $to_array ) !== false ){
+                    $do_to_array = true;
+                }
+                list($parsedArray, $newIndex) = lsc_debug_parse_array($lines, $i + 1, $do_to_array);
+                
+                $config[$key] = $parsedArray;
+                $i = $newIndex;
+            } else {
+                $value = rtrim($valuePart, ';');
+                
+                if ($value === 'true') {
+                    $config[$key] = true;
+                } elseif ($value === 'false') {
+                    $config[$key] = false;
+                } elseif (is_numeric($value)) {
+                    $config[$key] = (float)$value;
+                } 
+                else {
+                    $tmp_val      = trim($value, "'");
+                    $config[$key] = $do_html_decode ? htmlspecialchars_decode($tmp_val) : $tmp_val;
+                }
+            }
+        }
+        $i++;
+    }
+
+    return $config;
+}
+
+function lsc_debug_parse_array($lines, $startIndex, $to_array = false){
+    $result = [];
+    $i = $startIndex;
+    
+    while ($i < count($lines)) {
+        $line = trim($lines[$i]);
+        $line = str_replace("\'", "'", $line);
+
+        if ($line === ')') {
+            if( $to_array === false ){
+                $result = implode( "\n", $result);
+            }
+            
+            return [$result, $i];
+        }
+
+        // Handle nested arrays
+        if (preg_match('/^(\d+)\s*=>\s*array\s*\($/', $line, $matches)) {
+            $index = (int)$matches[1];
+            list($nestedArray, $newIndex) = lsc_debug_parse_array($lines, $i + 1, $to_array);
+            $result[$index] = $nestedArray;
+            $i = $newIndex;
+        }
+        // Handle simple indexed key-value pairs (e.g., 0 => 'string')
+        elseif (preg_match("/^[  ]*(\d+)\s*=>\s*'(.*)',?$/", $line, $matches)) {
+            if( $to_array === false ){
+                $result[] = $matches[2];
+            }
+            else{
+                $index = (int)$matches[1];
+                $value = $matches[2];
+                $result[$index] = $value;
+            }
+        }
+        // Handle associative key-value pairs (e.g., 'key' => 'string')
+        elseif (preg_match("/^[  ]*'([\w-]+)'\s*=>\s*'(.*)',?$/", $line, $matches)) {
+            $key = $matches[1];
+            $value = $matches[2];
+            $result[$key] = $value;
+        }
+        
+        $i++;
+    }
+
+    return [ $result, $i];
 }
