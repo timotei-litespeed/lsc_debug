@@ -131,3 +131,91 @@ function lsc_debug_clear_settings(){
         do_action( 'litespeed_purge_all' );
     }
 }
+
+// ---------- Reset TTL ----------
+function lsc_debug_reset_ttl() {
+    if ( ! is_admin() || ! current_user_can('manage_options') ) {
+        return;
+    }
+    if (
+        empty($_POST['litespeed_debug_nonce']) ||
+        ! wp_verify_nonce($_POST['litespeed_debug_nonce'], 'litespeed_debug_reset_ttl')
+    ) {
+        return;
+    }
+    if ( ! class_exists('\LiteSpeed\Cloud') ) {
+        return;
+    }
+    \LiteSpeed\Cloud::save_summary([
+        'ttl.ccss' => 0,
+        'ttl.ucss' => 0,
+        'ttl.vpi'  => 0,
+    ]);
+}
+
+// ---------- Image node ----------
+function lsc_debug_redetect_image_node($node = null){
+    if ( ! is_admin() || ! current_user_can('manage_options') ) {
+        return;
+    }
+    // Allow mapped call
+    if ($node === null) {
+        if (
+            empty($_POST['litespeed_debug_nonce']) ||
+            ! wp_verify_nonce($_POST['litespeed_debug_nonce'], 'litespeed_debug_redetect_image')
+        ) {
+            return;
+        }
+        $node = isset($_POST['image_node']) ? sanitize_text_field($_POST['image_node']) : '';
+    }
+
+    if ( ! $node || ! class_exists('\LiteSpeed\Cloud') ) {
+        return;
+    }
+
+    // normalize to lowercase value
+    $node = strtolower($node);
+    \LiteSpeed\Cloud::save_summary([
+        'server.img_optm' => 'https://' . $node . '.quic.cloud',
+    ]);
+}
+
+// ---------- Page node ----------
+function lsc_debug_redetect_page_node($service = null, $node = null){
+    if ( ! is_admin() || ! current_user_can('manage_options') ) {
+        return;
+    }
+    // Allow mapped call
+    if ($service === null || $node === null) {
+        if (
+            empty($_POST['litespeed_debug_nonce']) ||
+            ! wp_verify_nonce($_POST['litespeed_debug_nonce'], 'litespeed_debug_redetect_page')
+        ) {
+            return;
+        }
+        $service = isset($_POST['service']) ? sanitize_text_field($_POST['service']) : '';
+        $node    = isset($_POST['page_node']) ? sanitize_text_field($_POST['page_node']) : '';
+    }
+
+    if ( ! $service || ! $node || ! class_exists('\LiteSpeed\Cloud') ) {
+        return;
+    }
+
+    $map = [
+        'UCSS'             => 'server.ucss',
+        'CCSS'             => 'server.ccss',
+        'VPI'              => 'server.vpi',
+        'LQIP'             => 'server.lqip',
+        'Page Load Time'   => 'server.health',
+        'PageSpeed Score'  => 'server.health',
+    ];
+
+    if ( ! isset($map[$service]) ) {
+        return;
+    }
+
+    $node = strtolower($node);
+    \LiteSpeed\Cloud::save_summary([
+        $map[$service] => 'https://' . $node . '.quic.cloud',
+    ]);
+}
