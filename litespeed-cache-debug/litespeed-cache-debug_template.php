@@ -97,3 +97,163 @@ if( lsc_debug_show_admin_content() ){
         <li><a href="<?php echo lsc_debug_admin_create_link('clear_settings'); ?>">All settings !!!Make a backup!!!</a></li>
     </ul>
 <?php } ?>
+
+<h2>Redetect Nodes</h2>
+<hr>
+
+<div style="display: flex; gap: 20px; flex-wrap: wrap;">
+    <!-- Image Optimization Box -->
+    <div style="flex: 1; min-width: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0;">Image Optimization</h3>
+    
+    <?php 
+        // Get current node
+        $current_image_node = '';
+        if (class_exists('\LiteSpeed\Cloud')) {
+            $summary = \LiteSpeed\Cloud::get_summary();
+            $current_image_node = isset($summary['server.img_optm']) ? $summary['server.img_optm'] : 'Not set';
+        }
+        ?>
+            <div style="margin-bottom: 10px; padding: 5px 10px; background-color: #d4edda; color: #155724; border-radius: 4px; font-weight: bold; width: 72.5%;">
+                Current Node: <?php echo esc_html($current_image_node); ?>
+            </div>
+        
+        <form method="post" action=""><?php wp_nonce_field('litespeed_debug_redetect_image', 'litespeed_debug_nonce'); ?>
+            <input type="hidden" name="<?php echo esc_attr(LSCWP_DEBUG_PARAM_ACTION); ?>" value="redetect_image_node">
+            <label for="image_node_select">Select Node:</label><br>
+            <select id="image_node_select" name="image_node" style="width: 100%; margin-bottom: 10px;">
+            <option value="node117">Node117</option>
+            <option value="node119">Node119</option>
+            <option value="node693">Node693</option>
+            </select>
+            <button type="submit" class="button button-primary" style="width: 75.5%;">Update Node</button>
+        </form>
+    </div>
+
+    <!-- Page Optimization Box -->
+    <div style="flex: 1; min-width: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0;">Page Optimization</h3>
+
+        <?php
+        // Get current nodes for each service
+        $current_summary = [];
+        if (class_exists('\LiteSpeed\Cloud')) {
+            $current_summary = \LiteSpeed\Cloud::get_summary();
+        }
+        ?>
+
+        <div id="page_current_node" style="margin-bottom: 10px; padding: 5px 10px; background-color: #d4edda; color: #155724; border-radius: 4px; font-weight: bold; width: 72.5%;">
+            Current Node: <?php
+            $service = isset($_POST['service']) ? sanitize_text_field($_POST['service']) : 'UCSS';
+            $service_key_map = [
+                'UCSS' => 'server.ucss',
+                'CCSS' => 'server.ccss',
+                'VPI' => 'server.vpi',
+                'LQIP' => 'server.lqip',
+                'Page Load Time' => 'server.health',
+                'PageSpeed Score' => 'server.health'
+            ];
+            $key = isset($service_key_map[$service]) ? $service_key_map[$service] : '';
+            echo isset($current_summary[$key]) ? esc_html($current_summary[$key]) : 'Not set';
+            ?></div>
+
+            <form method="post" action="">
+            <?php wp_nonce_field('litespeed_debug_redetect_page', 'litespeed_debug_nonce'); ?>
+            <input type="hidden" name="<?php echo esc_attr(LSCWP_DEBUG_PARAM_ACTION); ?>" value="redetect_page_node">
+            <label for="service_select">Select Service:</label><br>
+            <select id="service_select" name="service" style="width: 100%; margin-bottom: 10px;">
+            <option value="UCSS" <?php selected($service, 'UCSS'); ?>>UCSS</option>
+            <option value="CCSS" <?php selected($service, 'CCSS'); ?>>CCSS</option>
+            <option value="VPI" <?php selected($service, 'VPI'); ?>>VPI</option>
+            <option value="LQIP" <?php selected($service, 'LQIP'); ?>>LQIP</option>
+            <option value="Page Load Time" <?php selected($service, 'Page Load Time'); ?>>Page Load Time</option>
+            <option value="PageSpeed Score" <?php selected($service, 'PageSpeed Score'); ?>>PageSpeed Score</option>
+            </select>
+
+            <br><label for="page_node_select">Select Node:</label><br>
+            <select id="page_node_select" name="page_node" style="width: 100%; margin-bottom: 10px;"></select>
+
+            <button type="submit" class="button button-primary" style="width: 75.5%;">Update Node</button>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript">
+    const serviceNodesMap = {
+        "UCSS": ["node19","node123","eu-service-ctr2","saw35-hyb-worker"],
+        "CCSS": ["node19","node123","eu-service-ctr2","saw35-hyb-worker"],
+        "VPI": ["node19","node123","eu-service-ctr2","saw35-hyb-worker"],
+        "LQIP": ["node13","node449","node3","node394"],
+        "Page Load Time": ["node13","node449","node3","node394"],
+        "PageSpeed Score": ["node13","node449","node3","node394"]
+    };
+
+    const serviceSelect = document.getElementById('service_select');
+    const pageNodeSelect = document.getElementById('page_node_select');
+    const pageCurrentNode = document.getElementById('page_current_node');
+
+    const keyMap = {
+        "UCSS":"server.ucss",
+        "CCSS":"server.ccss",
+        "VPI":"server.vpi",
+        "LQIP":"server.lqip",
+        "Page Load Time":"server.health",
+        "PageSpeed Score":"server.health"
+    };
+
+    // This comes from PHP (LiteSpeed summary)
+    let summary = <?php echo json_encode($current_summary); ?>;
+
+    function updateNodeOptions(){
+        const selectedService = serviceSelect.value;
+        const nodes = serviceNodesMap[selectedService] || [];
+
+        // Populate node dropdown
+        pageNodeSelect.innerHTML = '';
+        nodes.forEach(node => {
+            const opt = document.createElement('option');
+            opt.value = node;
+            opt.textContent = node.replace(/^node/, 'Node'); // nice display
+            pageNodeSelect.appendChild(opt);
+        });
+
+        // Update current node display
+        let key = keyMap[selectedService] || '';
+        let currentNode = summary[key] || 'Not set';
+        pageCurrentNode.textContent = "Current Node: " + currentNode;
+    }
+
+    // Initialize on load
+    serviceSelect.addEventListener('change', updateNodeOptions);
+    updateNodeOptions();
+</script>
+
+
+<h2>Reset Page Optimization Services TTL</h2>
+<hr>
+
+<div style="margin-top: 30px; flex: 1; min-width: 300px; background: #f8f9fa; padding: 20px; border-radius: 8px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); width: 30%;">
+    <h3 style="margin-top: 0;">Reset TTL</h3>
+
+    <?php
+    $ttl_ucss = $ttl_ccss = $ttl_vpi = 'Not set';
+    if (class_exists('\LiteSpeed\Cloud')) {
+        $summary = \LiteSpeed\Cloud::get_summary();
+        $ttl_ucss = isset($summary['ttl.ucss']) ? intval($summary['ttl.ucss']) : 'Not set';
+        $ttl_ccss = isset($summary['ttl.ccss']) ? intval($summary['ttl.ccss']) : 'Not set';
+        $ttl_vpi  = isset($summary['ttl.vpi'])  ? intval($summary['ttl.vpi']) : 'Not set';
+    }
+    ?>
+
+    <ul style="margin-bottom: 15px;">
+        <li><strong>UCSS TTL:</strong> <?php echo esc_html($ttl_ucss); ?></li>
+        <li><strong>CCSS TTL:</strong> <?php echo esc_html($ttl_ccss); ?></li>
+        <li><strong>VPI TTL:</strong> <?php echo esc_html($ttl_vpi); ?></li>
+    </ul>
+
+    <form method="post" action="">
+        <?php wp_nonce_field('litespeed_debug_reset_ttl', 'litespeed_debug_nonce'); ?>
+        <input type="hidden" name="<?php echo esc_attr(LSCWP_DEBUG_PARAM_ACTION); ?>" value="reset_ttl">
+        <button type="submit" class="button button-primary" style="width: 100%;">Reset TTL</button>
+    </form>
+</div>
